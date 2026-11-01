@@ -1,77 +1,51 @@
-# 📱 LinkedIn Post & Submission Guide
+# 📱 Updated LinkedIn Post & Submission Guide (For 100/100 Marks)
 
-Use the templates and instructions below to create your LinkedIn post, record a quick demo, and submit your assignment for maximum marks (100/100).
+This post caption directly addresses all 3 points of instructor feedback:
+1. ✅ **Project Purpose & UI Features for Doctors** (Clinical decision support, intake forms, "High Risk" vs "Low Risk" display).
+2. ✅ **Deep Technical Explanation** (Data preprocessing with `StandardScaler`, modal imputation, Logistic Regression math, and Next.js API frontend-to-model integration).
+3. ✅ **Deliverables & Visuals** (Includes your live GitHub repository link and instructions on attaching screenshots/demo video).
 
 ---
 
-## 📋 Ready-to-Copy LinkedIn Post Template
-
-> **Tip:** Simply copy the text below and paste it directly into your LinkedIn post. Attach 1-3 screenshots or a 15-second screen video of the app in action!
+## 📋 Ready-to-Copy LinkedIn Post Caption
 
 ```text
-🚀 Excited to share my latest Machine Learning & Web Development project: CardioPredict AI – A Full-Stack Heart Disease Risk Prediction Web Application! 🫀💻
+🚀 Excited to share my latest Full-Stack AI & Healthcare project: Heart Disease & Cardiac Risk Prediction Web Application! 🫀💻
 
-Cardiovascular disease remains the leading cause of global mortality. To address early triage and screening, I built an end-to-end clinical decision-support system that predicts cardiac risk directly from patient biomarkers.
+Cardiovascular diseases are the leading cause of mortality globally, making early detection vital. To assist doctors and healthcare professionals in rapid triage, I developed an end-to-end clinical decision-support system that predicts cardiac risk from key patient vitals.
 
-🔍 What I Built & Key Highlights:
-1️⃣ Machine Learning Pipeline (Python & Scikit-Learn):
-• Trained a Logistic Regression classifier on the benchmark UCI Cleveland Heart Disease dataset (303 patient records, 13 clinical biomarkers).
-• Comprehensive data preprocessing: modal imputation for missing attributes and StandardScaler Z-score normalization.
-• Achieved 86.89% Test Accuracy, 95.13% ROC-AUC, and 92.86% Recall (Sensitivity) to minimize false negatives in medical screening.
+---
 
-2️⃣ Full-Stack Web Application (Next.js 14, TypeScript & Tailwind CSS):
-• Modern, intuitive cardiology dashboard accepting 13 diagnostic parameters (Blood Pressure, Cholesterol, ST depression, Fluoroscopy vessels, etc.).
-• 1-Click Clinical Presets to instantly demonstrate Healthy vs. High-Risk cardiac patient profiles.
-• Real-time classification output ("High Risk" vs. "Low Risk") with confidence meters, Explainable AI (XAI) feature impact breakdown, and doctor care protocols.
+🩺 1. Project Purpose & Key Doctor-Facing UI Features:
+• Designed a clean, intuitive clinical interface using Next.js & Tailwind CSS tailored for doctors and healthcare workers.
+• Streamlined Patient Intake: Seamlessly captures vital markers including Age, Biological Sex, Resting Blood Pressure, and Heart Rate (BPM).
+• 1-Click Clinical Presets: Quick-test buttons simulating diverse patient profiles (Young & Healthy, Active Athlete, Tachycardia, and High-Risk Senior).
+• Dynamic Result Display: Instantly renders actionable diagnostic outcomes — classified into "Low Risk" or "High Risk" with exact risk probability scores, pulse category (Normal, Bradycardia, Tachycardia), and safe cardio exercise thresholds (220 - Age).
 
-🛠️ Tech Stack:
-• Frontend / Full-Stack: Next.js 14 (App Router), TypeScript, Tailwind CSS, Lucide Icons
-• Machine Learning: Python, Scikit-Learn, Pandas, NumPy, Joblib
-• Deployment & Architecture: REST API, JSON Model Serialization
+⚙️ 2. Machine Learning Architecture & Technical Methodology:
+• Algorithm: Trained a Logistic Regression classifier selected for its high interpretability, clinical reliability, and rapid inference.
+• Dataset & Preprocessing: Utilized the benchmark UCI Cleveland Heart Disease dataset. Imputed missing values using modal frequency, binarized the diagnostic target (0 = Low Risk, 1 = High Risk), and normalized features via StandardScaler (Z-score scaling) to eliminate biometric scale variances.
+• Frontend-to-Model Pipeline: Connected the interactive Next.js form directly to the model inference layer via Next.js API endpoints (/api/predict). The form serializes clinical inputs, scales the vector, computes sigmoid probabilities P(Y=1|X) = 1 / (1 + e^-z), and updates the UI in real-time with zero page reload.
 
-🔗 GitHub Repository: [PASTE YOUR GITHUB REPO LINK HERE]
+📦 3. Deliverables & Code Repository:
+🔗 GitHub Repository: https://github.com/manahilrehman/Heart-Rtae-Prediction
 
-A huge shoutout to our mentors and instructors for the continuous guidance and hands-on bootcamp curriculum! Looking forward to your feedback and thoughts in the comments. 💬
+🎥 Visual Demo:
+Attached below are screenshots/demo showing the doctor interface, input handling, and instantaneous "High Risk" vs "Low Risk" predictions in real-time!
 
-#MachineLearning #ArtificialIntelligence #Nextjs #WebDevelopment #DataScience #Python #ScikitLearn #HealthcareAI #FullStack #LogisticRegression #HealthTech
+A special thanks to my instructors and mentors for their continuous guidance and feedback throughout this project. I would love to hear your thoughts and feedback! 💬
+
+#MachineLearning #Nextjs #HealthcareAI #DataScience #Python #ScikitLearn #WebDevelopment #FullStack #LogisticRegression #HealthTech #Cardiology #ArtificialIntelligence
 ```
 
 ---
 
-## 📸 How to Take Screenshots or Record Demo Video (2 Minutes)
+## 📸 Checklist Before You Re-Submit on the LMS Portal:
 
-1. Open `index.html` or `public/preview.html` in your web browser (Chrome, Edge, or Brave).
-2. Click **"Sample 2: High Risk Cardiac Patient"** from the top presets bar.
-3. Click the cyan button **"Execute Logistic Regression Prediction"** — watch the **"High Risk (99.9%)"** card appear with animated red badges and clinical factors!
-4. Click **"Sample 1: Healthy Low Risk"** and click calculate again — watch it switch to **"Low Risk (3.2%)"**!
-5. **Screenshots:** Press `Windows Key + Shift + S` (Snipping Tool) to take 2-3 screenshots:
-   - One screenshot showing the High Risk prediction
-   - One screenshot showing the Low Risk prediction
-   - One screenshot showing the Model Specifications modal
-6. **Video (Optional but recommended):** Press `Windows Key + Alt + R` to record a 15-second screen recording showing both sample predictions.
-
----
-
-## 🐙 Step-by-Step GitHub Upload Guide
-
-1. Open your browser and go to **[https://github.com/new](https://github.com/new)**.
-2. Enter Repository name: `Heart-Disease-Prediction` (or `cardiopredict-ai`).
-3. Set visibility to **Public** and leave other options unchecked, then click **Create repository**.
-4. In your project folder terminal, run these commands:
-```powershell
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/Heart-Disease-Prediction.git
-git branch -M main
-git push -u origin main
-```
-5. Your code and professional `README.md` will now be live on GitHub!
-
----
-
-## 🎯 Final Step: Portal Submission
-
-1. Post on LinkedIn with the text template above and your screenshots/video.
-2. After publishing, click the **"..."** (three dots) on your LinkedIn post and select **"Copy link to post"**.
-3. Go back to your LMS portal page (where it currently says `40 / 100`).
-4. Paste your new LinkedIn post link in the **"Submit your LinkedIn post link below"** field.
-5. Click the green **"Re-submit"** button!
-
+1. **Attach 2-3 Screenshots or a Video to your LinkedIn post:**
+   - Screenshot 1: High Risk prediction output (Red banner, high risk %).
+   - Screenshot 2: Low Risk / Normal prediction output (Green banner, low risk %).
+   - Screenshot 3: Doctor patient input form and preset buttons.
+2. **Publish the LinkedIn Post:** Copy the caption above, attach your images, and click Post.
+3. **Copy the Post Link:** Click the three dots `...` on your published post and click **"Copy link to post"**.
+4. **Re-submit:** Go to your LMS portal, paste the new LinkedIn link into the input field, and click **Re-submit** to get your marks updated!
