@@ -1,0 +1,143 @@
+{
+  "model_name": "Logistic Regression Classifier",
+  "algorithm": "Logistic Regression (L-BFGS, L2 penalty)",
+  "features": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "scaler": {
+    "mean": [
+      54.549586776859506,
+      0.6818181818181818,
+      3.152892561983471,
+      130.95867768595042,
+      249.8388429752066,
+      0.1446280991735537,
+      0.9793388429752066,
+      149.96280991735537,
+      0.32644628099173556,
+      0.9991735537190083,
+      1.5867768595041323,
+      0.6074380165289256,
+      4.706611570247934
+    ],
+    "scale": [
+      8.978372765440131,
+      0.46577048936179993,
+      0.9734979428100604,
+      17.58610302878636,
+      52.737566192586975,
+      0.35172547832506873,
+      0.9977178384620765,
+      22.639527461380734,
+      0.4689126854952853,
+      1.1206178835595506,
+      0.612128402880701,
+      0.8807083258655833,
+      1.9435945032140787
+    ]
+  },
+  "model": {
+    "coefficients": [
+      -0.10315896459423862,
+      0.6555631571185634,
+      0.5434833116298503,
+      0.3136547980786784,
+      0.21537473784205488,
+      -0.2205602529760123,
+      0.21732900315439846,
+      -0.3484855321606103,
+      0.38364174726358474,
+      0.14995262212200938,
+      0.35407168302120684,
+      1.1078975676206029,
+      0.6778214891109823
+    ],
+    "intercept": -0.08085537219805353
+  },
+  "metrics": {
+    "accuracy": 86.89,
+    "roc_auc": 0.9513,
+    "precision": 81.25,
+    "recall": 92.86,
+    "f1_score": 0.8667
+  },
+  "feature_importance": [
+    {
+      "feature": "ca",
+      "coefficient": 1.1079,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "thal",
+      "coefficient": 0.6778,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "sex",
+      "coefficient": 0.6556,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "cp",
+      "coefficient": 0.5435,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "exang",
+      "coefficient": 0.3836,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "slope",
+      "coefficient": 0.3541,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "thalach",
+      "coefficient": -0.3485,
+      "risk_direction": "Negative (Protective)"
+    },
+    {
+      "feature": "trestbps",
+      "coefficient": 0.3137,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "fbs",
+      "coefficient": -0.2206,
+      "risk_direction": "Negative (Protective)"
+    },
+    {
+      "feature": "restecg",
+      "coefficient": 0.2173,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "chol",
+      "coefficient": 0.2154,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "oldpeak",
+      "coefficient": 0.15,
+      "risk_direction": "Positive (Increases Risk)"
+    },
+    {
+      "feature": "age",
+      "coefficient": -0.1032,
+      "risk_direction": "Negative (Protective)"
+    }
+  ]
+}
