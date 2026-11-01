@@ -55,3 +55,4 @@ if __name__ == '__main__':
     res = predict_patient(sample_patient)
     print(f"Result    : {res['prediction']}")
     print(f"Risk Score: {res['risk_score']}%")
+

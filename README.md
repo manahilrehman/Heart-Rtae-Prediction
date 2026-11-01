@@ -190,3 +190,4 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 - **Developer:** Manahil Rehman
 - **Email:** manahilrehman42200@gmail.com
 - **Assignment:** Capstone: Full-Stack Heart Disease Prediction Web App
+

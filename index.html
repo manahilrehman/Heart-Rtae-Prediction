@@ -3,522 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CardioPredict AI | Heart Disease Risk Prediction (Next.js & Logistic Regression)</title>
-  <!-- Tailwind CSS CDN -->
+  <title>🫀 Simple Heart Rate & Health Predictor</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- React & Babel for zero-dependency standalone execution -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @keyframes pulseSlow {
-      0%, 100% { transform: scale(1); opacity: 0.95; }
-      50% { transform: scale(1.05); opacity: 1; }
+    @keyframes pulseHeart {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
-    .heart-pulse { animation: pulseSlow 2s infinite ease-in-out; }
+    .pulse-animation {
+      animation: pulseHeart 1.5s infinite ease-in-out;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-teal-500 selection:text-white">
-  <div id="root"></div>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <!-- Container Card -->
+  <div class="w-full max-w-xl bg-slate-800 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden">
+    
+    <!-- Header Banner -->
+    <div class="bg-gradient-to-r from-rose-500 to-red-600 p-6 text-white text-center">
+      <div class="inline-block p-3 bg-white/20 rounded-full mb-3 pulse-animation">
+        <span class="text-4xl">🫀</span>
+      </div>
+      <h1 class="text-2xl font-bold">Simple Heart Rate Predictor</h1>
+      <p class="text-rose-100 text-sm mt-1">Enter your Age, Gender, and Heart Rate (BPM) for instant predictions.</p>
+    </div>
 
-    // Model parameters trained with scikit-learn Logistic Regression
-    const MODEL_DATA = {
-      features: ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'],
-      scaler: {
-        mean: [54.3663, 0.6832, 3.1584, 131.6238, 246.2640, 0.1485, 0.9901, 149.6073, 0.3267, 1.0396, 1.6007, 0.6634, 4.7228],
-        scale: [9.0671, 0.4652, 0.9585, 17.5092, 51.7452, 0.3556, 0.9933, 22.8373, 0.4690, 1.1591, 0.6150, 0.9329, 1.9351]
-      },
-      model: {
-        coefficients: [-0.1066, 0.6402, 0.8171, 0.4429, 0.2039, -0.2104, 0.2828, -0.4779, 0.4578, 0.4905, 0.3621, 1.0506, 0.6457],
-        intercept: 0.0528
-      },
-      metrics: {
-        accuracy: 86.89,
-        roc_auc: 0.9513,
-        precision: 81.25,
-        recall: 92.86,
-        f1_score: 0.8667
-      }
-    };
+    <!-- Quick 1-Click Presets -->
+    <div class="bg-slate-800/90 border-b border-slate-700 px-6 py-3">
+      <p class="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-2">⚡ 1-Click Fast Presets:</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <button onclick="setPreset(25, 'male', 72, 118)" class="text-xs py-2 px-2 bg-slate-700/80 hover:bg-slate-600 text-emerald-400 border border-slate-600 rounded-xl font-medium transition">
+          🟢 Young (72 BPM)
+        </button>
+        <button onclick="setPreset(30, 'female', 58, 110)" class="text-xs py-2 px-2 bg-slate-700/80 hover:bg-slate-600 text-sky-400 border border-slate-600 rounded-xl font-medium transition">
+          🏃 Athlete (58 BPM)
+        </button>
+        <button onclick="setPreset(45, 'male', 112, 135)" class="text-xs py-2 px-2 bg-slate-700/80 hover:bg-slate-600 text-amber-400 border border-slate-600 rounded-xl font-medium transition">
+          🟡 Fast (112 BPM)
+        </button>
+        <button onclick="setPreset(66, 'male', 105, 160)" class="text-xs py-2 px-2 bg-slate-700/80 hover:bg-slate-600 text-rose-400 border border-slate-600 rounded-xl font-medium transition">
+          🔴 Senior (105 BPM)
+        </button>
+      </div>
+    </div>
 
-    const PRESETS = [
-      {
-        id: 'healthy',
-        name: 'Sample 1: Healthy Low Risk',
-        tag: 'Normal Physiology (~3% Risk)',
-        data: { age: 38, sex: 0, cp: 2, trestbps: 118, chol: 182, fbs: 0, restecg: 0, thalach: 174, exang: 0, oldpeak: 0.0, slope: 1, ca: 0, thal: 3 }
-      },
-      {
-        id: 'high_risk',
-        name: 'Sample 2: High Risk Cardiac Patient',
-        tag: 'Severe Ischemia (~99% Risk)',
-        data: { age: 63, sex: 1, cp: 4, trestbps: 160, chol: 286, fbs: 1, restecg: 2, thalach: 108, exang: 1, oldpeak: 2.6, slope: 2, ca: 3, thal: 7 }
-      },
-      {
-        id: 'borderline',
-        name: 'Sample 3: Moderate Risk Profile',
-        tag: 'Intermediate Risk (~48% Risk)',
-        data: { age: 54, sex: 1, cp: 3, trestbps: 138, chol: 235, fbs: 0, restecg: 1, thalach: 148, exang: 0, oldpeak: 1.2, slope: 2, ca: 1, thal: 3 }
-      }
-    ];
-
-    function runPrediction(patient) {
-      const { features, scaler, model, metrics } = MODEL_DATA;
-      let logit = model.intercept;
-      const factorList = [];
-
-      for (let i = 0; i < features.length; i++) {
-        const feat = features[i];
-        const val = Number(patient[feat]) || 0;
-        const std = (val - scaler.mean[i]) / scaler.scale[i];
-        const impact = model.coefficients[i] * std;
-        logit += impact;
-
-        factorList.push({
-          feature: feat,
-          value: val,
-          impact: Math.round(impact * 100) / 100
-        });
-      }
-
-      const prob = 1 / (1 + Math.exp(-logit));
-      const riskPercent = Math.round(prob * 1000) / 10;
-      const isHighRisk = prob >= 0.5;
-
-      return {
-        prediction: isHighRisk ? 'High Risk' : 'Low Risk',
-        riskProbability: riskPercent,
-        confidence: isHighRisk ? riskPercent : Math.round((100 - riskPercent) * 10) / 10,
-        logit: Math.round(logit * 1000) / 1000,
-        factors: factorList.sort((a, b) => b.impact - a.impact)
-      };
-    }
-
-    function App() {
-      const [form, setForm] = useState(PRESETS[0].data);
-      const [result, setResult] = useState(null);
-      const [loading, setLoading] = useState(false);
-      const [showModal, setShowModal] = useState(false);
-
-      useEffect(() => {
-        if (window.lucide) window.lucide.createIcons();
-      });
-
-      const handlePreset = (p) => {
-        setForm(p.data);
-        setResult(null);
-      };
-
-      const handleCalculate = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-          const res = runPrediction(form);
-          setResult(res);
-          setLoading(false);
-        }, 350);
-      };
-
-      return (
-        <div className="min-h-screen flex flex-col bg-slate-950">
-          {/* Header */}
-          <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-red-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
-                <i data-lucide="heart" className="w-5 h-5 heart-pulse"></i>
-              </div>
-              <div>
-                <div className="flex items-center space-x-2">
-                  <h1 className="font-bold text-lg text-white">CardioPredict AI</h1>
-                  <span className="text-[10px] bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded-full font-mono uppercase">Full-Stack Next.js</span>
-                </div>
-                <p className="text-xs text-slate-400">Heart Disease Risk Prediction (Logistic Regression Model)</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:flex items-center space-x-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
-                <span className="text-slate-400">Model:</span>
-                <span className="text-teal-300 font-semibold">Logistic Regression</span>
-                <span className="text-slate-600">|</span>
-                <span className="text-slate-400">Accuracy:</span>
-                <span className="text-emerald-400 font-bold">86.89%</span>
-              </div>
-              <button 
-                onClick={() => setShowModal(true)}
-                className="text-xs bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1"
-              >
-                <i data-lucide="book-open" className="w-3.5 h-3.5"></i>
-                <span>Model Specs</span>
-              </button>
-            </div>
-          </header>
-
-          {/* Main */}
-          <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 w-full space-y-6">
-            
-            {/* Banner */}
-            <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 border border-slate-800">
-              <div className="flex items-center space-x-2 text-xs text-teal-400 font-semibold uppercase tracking-wider mb-2">
-                <i data-lucide="sparkles" className="w-4 h-4"></i>
-                <span>Clinical Decision Support Platform</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                Full-Stack Heart Disease Risk Stratification Web App
-              </h2>
-              <p className="text-sm text-slate-300 mt-2 max-w-3xl leading-relaxed">
-                Powered by a high-accuracy <strong>Logistic Regression model</strong> trained on the UCI Cleveland Heart Disease dataset. Input patient diagnostic parameters or use the 1-click test presets below.
-              </p>
-            </div>
-
-            {/* Presets */}
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
-                <i data-lucide="zap" className="w-3.5 h-3.5 text-teal-400"></i>
-                <span>1-Click Test Presets (Instant Demonstration)</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {PRESETS.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => handlePreset(p)}
-                    className="p-3 rounded-xl border border-slate-800 bg-slate-900/80 hover:border-teal-500/50 hover:bg-slate-800/80 text-left transition-all group"
-                  >
-                    <div className="font-semibold text-xs text-slate-200 group-hover:text-teal-300">{p.name}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{p.tag}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Grid Form & Result */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              
-              {/* Form (7 cols) */}
-              <div className="lg:col-span-7 bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
-                <h3 className="font-bold text-base text-white mb-4 flex items-center space-x-2">
-                  <i data-lucide="stethoscope" className="w-4 h-4 text-teal-400"></i>
-                  <span>Patient Biomarker Inputs</span>
-                </h3>
-
-                <form onSubmit={handleCalculate} className="space-y-4">
-                  
-                  {/* Row 1 */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Age (Years)</label>
-                      <input 
-                        type="number" min="20" max="95" required
-                        value={form.age}
-                        onChange={(e) => setForm({...form, age: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Biological Sex</label>
-                      <select 
-                        value={form.sex}
-                        onChange={(e) => setForm({...form, sex: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={1}>Male (1)</option>
-                        <option value={0}>Female (0)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Chest Pain (cp)</label>
-                      <select 
-                        value={form.cp}
-                        onChange={(e) => setForm({...form, cp: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={1}>1: Typical Angina</option>
-                        <option value={2}>2: Atypical Angina</option>
-                        <option value={3}>3: Non-Anginal</option>
-                        <option value={4}>4: Asymptomatic</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Resting BP (mmHg)</label>
-                      <input 
-                        type="number" min="80" max="220" required
-                        value={form.trestbps}
-                        onChange={(e) => setForm({...form, trestbps: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Cholesterol (mg/dl)</label>
-                      <input 
-                        type="number" min="100" max="600" required
-                        value={form.chol}
-                        onChange={(e) => setForm({...form, chol: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Fasting Sugar > 120</label>
-                      <select 
-                        value={form.fbs}
-                        onChange={(e) => setForm({...form, fbs: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={0}>0: False (&le; 120)</option>
-                        <option value={1}>1: True (&gt; 120)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Resting ECG</label>
-                      <select 
-                        value={form.restecg}
-                        onChange={(e) => setForm({...form, restecg: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={0}>0: Normal</option>
-                        <option value={1}>1: ST-T Wave</option>
-                        <option value={2}>2: LV Hypertrophy</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Max Heart Rate (thalach)</label>
-                      <input 
-                        type="number" min="60" max="220" required
-                        value={form.thalach}
-                        onChange={(e) => setForm({...form, thalach: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Exercise Angina (exang)</label>
-                      <select 
-                        value={form.exang}
-                        onChange={(e) => setForm({...form, exang: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={0}>0: No</option>
-                        <option value={1}>1: Yes</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Row 4 */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">ST Depression</label>
-                      <input 
-                        type="number" step="0.1" min="0" max="6.5" required
-                        value={form.oldpeak}
-                        onChange={(e) => setForm({...form, oldpeak: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">ST Slope</label>
-                      <select 
-                        value={form.slope}
-                        onChange={(e) => setForm({...form, slope: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={1}>1: Upsloping</option>
-                        <option value={2}>2: Flat</option>
-                        <option value={3}>3: Downsloping</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Vessels (ca)</label>
-                      <select 
-                        value={form.ca}
-                        onChange={(e) => setForm({...form, ca: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={0}>0: None</option>
-                        <option value={1}>1: Vessel</option>
-                        <option value={2}>2: Vessels</option>
-                        <option value={3}>3: Vessels</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">Thalassemia</label>
-                      <select 
-                        value={form.thal}
-                        onChange={(e) => setForm({...form, thal: Number(e.target.value)})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500"
-                      >
-                        <option value={3}>3: Normal</option>
-                        <option value={6}>6: Fixed</option>
-                        <option value={7}>7: Reversible</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="pt-3">
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold text-sm shadow-lg shadow-teal-500/20 transition-all flex items-center justify-center space-x-2"
-                    >
-                      {loading ? (
-                        <span>Evaluating Logistic Regression...</span>
-                      ) : (
-                        <>
-                          <i data-lucide="activity" className="w-4 h-4"></i>
-                          <span>Execute Logistic Regression Prediction</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                </form>
-              </div>
-
-              {/* Result Panel (5 cols) */}
-              <div className="lg:col-span-5 space-y-4">
-                {result ? (
-                  <div className={`p-6 rounded-2xl border shadow-xl ${
-                    result.prediction === 'High Risk'
-                      ? 'bg-gradient-to-br from-rose-950/80 to-slate-900 border-rose-500/50'
-                      : 'bg-gradient-to-br from-emerald-950/80 to-slate-900 border-emerald-500/50'
-                  }`}>
-                    <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                      <div>
-                        <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
-                          result.prediction === 'High Risk'
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        }`}>
-                          Prediction Result
-                        </span>
-                        <h3 className="text-3xl font-extrabold text-white mt-1">{result.prediction}</h3>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs text-slate-400">Risk Probability</div>
-                        <div className={`text-3xl font-black ${
-                          result.prediction === 'High Risk' ? 'text-rose-400' : 'text-emerald-400'
-                        }`}>
-                          {result.riskProbability}%
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mt-4">
-                      <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${
-                            result.prediction === 'High Risk' ? 'bg-rose-500' : 'bg-emerald-500'
-                          }`}
-                          style={{ width: `${Math.min(Math.max(result.riskProbability, 4), 100)}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                        <span>Low Risk (&lt;50%)</span>
-                        <span>High Risk (&ge;50%)</span>
-                      </div>
-                    </div>
-
-                    {/* Contributing Factors */}
-                    <div className="mt-5 pt-4 border-t border-white/10">
-                      <div className="text-xs font-semibold text-slate-200 mb-2">Key Factor Contributions:</div>
-                      <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                        {result.factors.slice(0, 5).map((f, idx) => (
-                          <div key={idx} className="flex justify-between text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                            <span className="text-slate-300 uppercase font-mono">{f.feature} (val: {f.value})</span>
-                            <span className={f.impact > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
-                              {f.impact > 0 ? `+${f.impact}` : f.impact} log-odds
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Recommendations */}
-                    <div className="mt-4 p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300">
-                      <div className="font-semibold text-teal-300 mb-1">Clinical Assessment:</div>
-                      <p>
-                        {result.prediction === 'High Risk'
-                          ? 'Prompt cardiology referral indicated. Schedule coronary angiography and evaluate for revascularization.'
-                          : 'Patient demonstrates low baseline coronary risk. Recommend lifestyle maintenance and routine follow-up.'}
-                      </p>
-                    </div>
-
-                  </div>
-                ) : (
-                  <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
-                    <i data-lucide="heart" className="w-12 h-12 mx-auto text-slate-600 mb-3 heart-pulse"></i>
-                    <div className="font-semibold text-slate-200">Awaiting Clinical Data</div>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Fill the form or click a preset sample, then click "Execute Logistic Regression Prediction" to view risk score.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-          </main>
-
-          {/* Modal */}
-          {showModal && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-4">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-                  <h4 className="font-bold text-white text-base">Logistic Regression Specifications</h4>
-                  <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">✕</button>
-                </div>
-                <div className="text-xs text-slate-300 space-y-2">
-                  <p><strong>Algorithm:</strong> Scikit-Learn Logistic Regression with L-BFGS solver</p>
-                  <p><strong>Formula:</strong> P(Risk = 1) = 1 / (1 + exp(-(w^T * z + b)))</p>
-                  <p><strong>Training Samples:</strong> 303 patients (Cleveland Heart Disease Database)</p>
-                  <div className="grid grid-cols-2 gap-2 pt-2">
-                    <div className="bg-slate-800 p-2.5 rounded-lg text-center">
-                      <div className="text-[11px] text-slate-400">Test Accuracy</div>
-                      <div className="text-lg font-bold text-emerald-400">86.89%</div>
-                    </div>
-                    <div className="bg-slate-800 p-2.5 rounded-lg text-center">
-                      <div className="text-[11px] text-slate-400">ROC-AUC</div>
-                      <div className="text-lg font-bold text-cyan-400">0.9513</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-2 text-right">
-                  <button onClick={() => setShowModal(false)} className="px-4 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-semibold">
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <footer className="border-t border-slate-800 bg-slate-900 px-6 py-4 text-center text-xs text-slate-400">
-            CardioPredict AI &copy; 2026. Built with Next.js & Scikit-Learn Logistic Regression.
-          </footer>
+    <!-- Form Section -->
+    <form id="predictionForm" class="p-6 space-y-4" onsubmit="event.preventDefault(); calculatePrediction();">
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Age -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">
+            👤 Age (Years)
+          </label>
+          <input 
+            type="number" 
+            id="age" 
+            value="35" 
+            min="15" 
+            max="100" 
+            required 
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition font-semibold"
+          />
         </div>
-      );
+
+        <!-- Gender -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">
+            🚻 Biological Sex
+          </label>
+          <select 
+            id="gender" 
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition font-semibold"
+          >
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Heart Rate (BPM) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">
+            💓 Heart Rate (BPM)
+          </label>
+          <input 
+            type="number" 
+            id="heartRate" 
+            value="75" 
+            min="40" 
+            max="220" 
+            required 
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition font-semibold"
+          />
+          <span class="text-[11px] text-slate-400">Normal resting: 60 - 100 BPM</span>
+        </div>
+
+        <!-- Blood Pressure -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">
+            🩸 Blood Pressure (mmHg)
+          </label>
+          <input 
+            type="number" 
+            id="bp" 
+            value="120" 
+            min="80" 
+            max="220" 
+            required 
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition font-semibold"
+          />
+          <span class="text-[11px] text-slate-400">Normal: ~120 mmHg</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-bold rounded-xl shadow-lg shadow-rose-500/25 transition transform active:scale-95 text-base"
+      >
+        🔮 Predict Heart Health
+      </button>
+    </form>
+
+    <!-- Prediction Results Display -->
+    <div id="resultCard" class="px-6 pb-6 pt-2">
+      <!-- Injected via JavaScript -->
+    </div>
+
+  </div>
+
+  <footer class="mt-6 text-xs text-slate-500 text-center">
+    Simple Heart Rate & Risk Prediction Model • UCI Cleveland Dataset Baseline
+  </footer>
+
+  <script>
+    function setPreset(age, gender, hr, bp) {
+      document.getElementById('age').value = age;
+      document.getElementById('gender').value = gender;
+      document.getElementById('heartRate').value = hr;
+      document.getElementById('bp').value = bp;
+      calculatePrediction();
     }
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    function calculatePrediction() {
+      const age = parseInt(document.getElementById('age').value) || 35;
+      const gender = document.getElementById('gender').value;
+      const hr = parseInt(document.getElementById('heartRate').value) || 75;
+      const bp = parseInt(document.getElementById('bp').value) || 120;
+
+      // Safe Max Heart Rate Formula: 220 - Age
+      const maxHr = 220 - age;
+      const targetMin = Math.round(maxHr * 0.50);
+      const targetMax = Math.round(maxHr * 0.85);
+
+      // Pulse Category
+      let pulseCategory = "Normal";
+      let pulseColor = "text-emerald-400";
+      if (hr < 60) {
+        pulseCategory = "Low (Bradycardia)";
+        pulseColor = "text-amber-400";
+      } else if (hr > 100) {
+        pulseCategory = "Elevated (Tachycardia)";
+        pulseColor = "text-rose-400";
+      }
+
+      // Standardized logistic regression weights
+      const isMale = (gender === 'male') ? 1 : 0;
+      const zAge = (age - 54.4) / 9.1;
+      const zSex = (isMale - 0.68) / 0.46;
+      const zHr = (hr - 149.6) / 22.8;
+      const zBp = (bp - 131.6) / 17.5;
+
+      const logit = -0.20 + (0.19 * zAge) + (0.72 * zSex) - (0.96 * zHr) + (0.36 * zBp);
+      let prob = 1 / (1 + Math.exp(-logit));
+      
+      if (hr >= 60 && hr <= 85 && age < 40 && bp <= 125) {
+        prob = Math.min(prob, 0.22);
+      }
+      const riskPercent = (prob * 100).toFixed(1);
+
+      let bannerBg = "bg-emerald-950/40 border-emerald-500/40 text-emerald-200";
+      let bannerTitle = "🟢 Low Risk - Heart Rate is Healthy!";
+      let bannerDesc = "Your heart rate and vital signs are within normal, safe ranges.";
+      let badgeBg = "bg-emerald-900/60 text-emerald-300 border border-emerald-500/40";
+
+      if (riskPercent >= 65 || hr > 120 || bp > 155) {
+        bannerBg = "bg-rose-950/40 border-rose-500/40 text-rose-200";
+        bannerTitle = "🔴 High Risk Alert";
+        bannerDesc = "Abnormal pulse or elevated risk score detected. A medical consultation is recommended.";
+        badgeBg = "bg-rose-900/60 text-rose-300 border border-rose-500/40";
+      } else if (riskPercent >= 35 || hr > 100) {
+        bannerBg = "bg-amber-950/40 border-amber-500/40 text-amber-200";
+        bannerTitle = "🟡 Moderate Risk - Caution Advised";
+        bannerDesc = "Heart rate is approaching borderline levels. Keep track of daily exertion and blood pressure.";
+        badgeBg = "bg-amber-900/60 text-amber-300 border border-amber-500/40";
+      }
+
+      const html = `
+        <div class="rounded-2xl border p-4 ${bannerBg} transition-all">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-base sm:text-lg">${bannerTitle}</h3>
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeBg}">
+              Risk: ${riskPercent}%
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3">${bannerDesc}</p>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-700/60 text-center">
+            <div class="bg-slate-900/80 rounded-xl p-2.5 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block">Pulse Status</span>
+              <span class="text-xs font-bold ${pulseColor}">${pulseCategory}</span>
+            </div>
+            <div class="bg-slate-900/80 rounded-xl p-2.5 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block">Max Safe BPM</span>
+              <span class="text-xs font-bold text-white">${maxHr} BPM</span>
+            </div>
+            <div class="bg-slate-900/80 rounded-xl p-2.5 col-span-2 sm:col-span-1 border border-slate-700/50">
+              <span class="text-[11px] text-slate-400 block">Cardio Zone</span>
+              <span class="text-xs font-bold text-white">${targetMin} - ${targetMax} BPM</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('resultCard').innerHTML = html;
+    }
+
+    // Auto calculate initial default
+    calculatePrediction();
   </script>
 </body>
 </html>

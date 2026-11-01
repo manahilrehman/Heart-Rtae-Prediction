@@ -208,3 +208,4 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
     </div>
   );
 };
+

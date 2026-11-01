@@ -74,3 +74,4 @@ git push -u origin main
 3. Go back to your LMS portal page (where it currently says `40 / 100`).
 4. Paste your new LinkedIn post link in the **"Submit your LinkedIn post link below"** field.
 5. Click the green **"Re-submit"** button!
+

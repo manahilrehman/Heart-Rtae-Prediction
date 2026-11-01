@@ -116,3 +116,4 @@ export const PresetSelector: React.FC<PresetSelectorProps> = ({ onSelect }) => {
     </div>
   );
 };
+
